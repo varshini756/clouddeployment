@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Y-Bus Calculator | SmartGrid Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4f8;--surface:#ffffff;--surface2:#f8fafc;--border:#e2e8f0;--primary:#1d4ed8;--primary-l:#3b82f6;--primary-d:#1e3a8a;--teal:#0891b2;--text:#0f172a;--text2:#334155;--muted:#64748b;--success:#16a34a;--err:#dc2626;--shadow:0 4px 24px rgba(15,23,42,0.08);--shadow-lg:0 12px 48px rgba(15,23,42,0.14);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(15,23,42,0.06);}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo{width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.nav-brand span{font-size:1.1rem;font-weight:700;color:var(--text);}
+.nav-links{display:flex;gap:0.5rem;}
+.nav-links a{padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:500;color:var(--text2);transition:all 0.2s;}
+.nav-links a:hover,.nav-links a.active{background:rgba(29,78,216,0.08);color:var(--primary);}
+.container{max-width:1100px;margin:0 auto;padding:2rem;}
+.page-header{margin-bottom:2rem;}
+.breadcrumb{font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;display:flex;align-items:center;gap:6px;}
+.breadcrumb a{color:var(--primary);text-decoration:none;}
+h1{font-size:1.8rem;font-weight:800;color:var(--text);letter-spacing:-0.5px;margin-bottom:0.3rem;}
+.page-sub{color:var(--muted);font-size:0.9rem;}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;}
+@media(max-width:768px){.layout{grid-template-columns:1fr;}}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.8rem;}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.card-head-icon{width:36px;height:36px;background:rgba(29,78,216,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.card-head h2{font-size:1rem;font-weight:700;color:var(--text);}
+.card-head p{font-size:0.78rem;color:var(--muted);}
+table.input-table{width:100%;border-collapse:collapse;}
+table.input-table th{font-size:0.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 6px;border-bottom:2px solid var(--border);text-align:left;}
+table.input-table td{padding:4px 4px;}
+table.input-table input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--text);padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+table.input-table input:focus{border-color:var(--primary);background:#fff;}
+.row-num{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);padding:0 6px!important;text-align:center;}
+.btn-del{background:transparent;border:1.5px solid var(--border);color:var(--muted);border-radius:6px;padding:6px 9px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;line-height:1;}
+.btn-del:hover{border-color:var(--err);color:var(--err);background:rgba(220,38,38,0.04);}
+.btn-row{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{border:none;border-radius:8px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-add{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);}
+.btn-add:hover{border-color:var(--primary);color:var(--primary);}
+.btn-compute{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(29,78,216,0.25);}
+.btn-compute:hover{background:var(--primary-d);transform:translateY(-1px);box-shadow:0 6px 18px rgba(29,78,216,0.35);}
+.btn-clear{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-clear:hover{border-color:var(--err);color:var(--err);}
+.result-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.8rem;display:none;}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.5rem;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-size:0.75rem;font-weight:600;}
+.badge-green{background:rgba(22,163,74,0.1);color:var(--success);border:1px solid rgba(22,163,74,0.2);}
+.badge-blue{background:rgba(29,78,216,0.08);color:var(--primary);border:1px solid rgba(29,78,216,0.2);}
+.matrix-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
+.matrix-table{border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.78rem;width:100%;}
+.matrix-table th{background:var(--surface2);color:var(--primary);padding:9px 14px;border:1px solid var(--border);text-align:center;font-weight:600;font-size:0.72rem;}
+.matrix-table td{padding:9px 14px;border:1px solid var(--border);text-align:center;color:var(--text2);}
+.matrix-table tr:hover td{background:rgba(29,78,216,0.03);}
+.matrix-table td.diag{color:var(--primary);font-weight:600;background:rgba(29,78,216,0.04);}
+.err-box{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:8px;padding:12px 16px;color:var(--err);font-size:0.85rem;font-family:'JetBrains Mono',monospace;margin-top:1rem;display:none;}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.info-box{background:rgba(29,78,216,0.04);border:1px solid rgba(29,78,216,0.12);border-radius:8px;padding:1rem 1.2rem;font-size:0.82rem;color:var(--text2);line-height:1.6;margin-bottom:1.2rem;}
+.info-box strong{color:var(--primary);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">
+    <div class="nav-logo">⚡</div>
+    <div><span>SmartGrid Cloud</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="/ybus" class="active">Y-Bus</a>
+    <a href="/zbus">Z-Bus</a>
+    <a href="/loadflow">Load Flow</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <div class="breadcrumb"><a href="/">Home</a> › Y-Bus Calculator</div>
+    <h1>⚡ Y-Bus Calculator</h1>
+    <p class="page-sub">Compute the nodal admittance matrix from branch data</p>
+  </div>
+
+  <div class="layout">
+    <!-- Input -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-icon">📋</div>
+        <div><h2>Branch Data</h2><p>Enter transmission line parameters</p></div>
+      </div>
+
+      <div class="info-box">
+        <strong>How to fill:</strong> Enter From Bus, To Bus, Resistance R (pu), Reactance X (pu). Line charging B (pu) is optional — leave 0 if not applicable.
+      </div>
+
+      <table class="input-table">
+        <thead>
+          <tr>
+            <th>#</th><th>From Bus</th><th>To Bus</th>
+            <th>R (pu)</th><th>X (pu)</th><th>B (pu)</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="branchBody"></tbody>
+      </table>
+
+      <div class="btn-row">
+        <button class="btn btn-add" onclick="addRow()">+ Add Branch</button>
+        <button class="btn btn-compute" onclick="compute()">
+          <span id="btnText">Compute Y-Bus</span>
+          <span id="btnSpinner" class="spinner" style="display:none;"></span>
+        </button>
+        <button class="btn btn-clear" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="err-box" id="errBox"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card" id="resultCard">
+      <div class="result-header">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;">Y-Bus Matrix</h2>
+          <p style="font-size:0.78rem;color:var(--muted);">Nodal Admittance Matrix (per unit)</p>
+        </div>
+        <span class="badge badge-green" id="statusBadge">✓ Computed</span>
+      </div>
+      <div class="matrix-wrap" id="matrixWrap"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let rowCount = 0;
+
+function addRow(fb='', tb='', r='', x='', b='0') {
+  rowCount++;
+  const tr = document.createElement('tr');
+  tr.id = 'r' + rowCount;
+  tr.innerHTML = `
+    <td class="row-num">${rowCount}</td>
+    <td><input type="number" min="1" placeholder="1" value="${fb}"/></td>
+    <td><input type="number" min="1" placeholder="2" value="${tb}"/></td>
+    <td><input type="number" step="any" placeholder="0.02" value="${r}"/></td>
+    <td><input type="number" step="any" placeholder="0.06" value="${x}"/></td>
+    <td><input type="number" step="any" placeholder="0" value="${b}"/></td>
+    <td><button class="btn-del" onclick="document.getElementById('r${rowCount}').remove()">✕</button></td>
+  `;
+  document.getElementById('branchBody').appendChild(tr);
+}
+
+function clearAll() {
+  document.getElementById('branchBody').innerHTML = '';
+  rowCount = 0;
+  document.getElementById('resultCard').style.display = 'none';
+  hideErr();
+}
+
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+}
+function hideErr() { document.getElementById('errBox').style.display = 'none'; }
+
+function getRows() {
+  const rows = document.querySelectorAll('#branchBody tr');
+  const branches = [];
+  for (const row of rows) {
+    const inp = row.querySelectorAll('input');
+    const fb = parseInt(inp[0].value);
+    const tb = parseInt(inp[1].value);
+    const r  = parseFloat(inp[2].value);
+    const x  = parseFloat(inp[3].value);
+    const b  = parseFloat(inp[4].value) || 0;
+    if (isNaN(fb)||isNaN(tb)||isNaN(r)||isNaN(x)) return null;
+    branches.push({from_bus:fb, to_bus:tb, r, x, b});
+  }
+  return branches;
+}
+
+function buildMatrix(data, n) {
+  let html = '<table class="matrix-table"><thead><tr><th></th>';
+  for (let c=1;c<=n;c++) html += `<th>Bus ${c}</th>`;
+  html += '</tr></thead><tbody>';
+  for (let r=0;r<n;r++) {
+    html += `<tr><th>Bus ${r+1}</th>`;
+    for (let c=0;c<n;c++) {
+      html += `<td class="${r===c?'diag':''}">${data[r][c]}</td>`;
+    }
+    html += '</tr>';
+  }
+  return html + '</tbody></table>';
+}
+
+async function compute() {
+  hideErr();
+  const branches = getRows();
+  if (!branches || branches.length === 0) { showErr('Please add at least one branch.'); return; }
+
+  document.getElementById('btnText').textContent = 'Computing...';
+  document.getElementById('btnSpinner').style.display = 'inline-block';
+  document.querySelector('.btn-compute').disabled = true;
+
+  try {
+    const res  = await fetch('/api/ybus', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({branches}) });
+    const data = await res.json();
+    if (data.error) { showErr(data.error); return; }
+
+    document.getElementById('matrixWrap').innerHTML = buildMatrix(data.ybus, data.n_buses);
+    document.getElementById('statusBadge').textContent = `✓ ${data.n_buses}-Bus System`;
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    showErr('Connection error: ' + e.message);
+  } finally {
+    document.getElementById('btnText').textContent = 'Compute Y-Bus';
+    document.getElementById('btnSpinner').style.display = 'none';
+    document.querySelector('.btn-compute').disabled = false;
+  }
+}
+
+// Default 3-bus example
+addRow(1,2,0.02,0.06,0);
+addRow(1,3,0.08,0.24,0);
+addRow(2,3,0.06,0.18,0);
+</script>
+</body>
+</html>

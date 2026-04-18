@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Load Flow Analysis | SmartGrid Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4f8;--surface:#ffffff;--surface2:#f8fafc;--border:#e2e8f0;--primary:#1d4ed8;--amber:#d97706;--amber-d:#b45309;--text:#0f172a;--text2:#334155;--muted:#64748b;--success:#16a34a;--err:#dc2626;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(15,23,42,0.06);}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo{width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.nav-brand span{font-size:1.1rem;font-weight:700;color:var(--text);}
+.nav-links{display:flex;gap:0.5rem;}
+.nav-links a{padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:500;color:var(--text2);transition:all 0.2s;}
+.nav-links a:hover,.nav-links a.active{background:rgba(217,119,6,0.08);color:var(--amber);}
+.container{max-width:1100px;margin:0 auto;padding:2rem;}
+.page-header{margin-bottom:2rem;}
+.breadcrumb{font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+h1{font-size:1.8rem;font-weight:800;color:var(--text);letter-spacing:-0.5px;margin-bottom:0.3rem;}
+.page-sub{color:var(--muted);font-size:0.9rem;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:768px){.two-col{grid-template-columns:1fr;}}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.8rem;margin-bottom:1.5rem;}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:1.2rem;}
+.card-head-icon{width:36px;height:36px;background:rgba(217,119,6,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.card-head h2{font-size:1rem;font-weight:700;color:var(--text);}
+.card-head p{font-size:0.78rem;color:var(--muted);}
+table.input-table{width:100%;border-collapse:collapse;}
+table.input-table th{font-size:0.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 6px;border-bottom:2px solid var(--border);text-align:left;}
+table.input-table td{padding:4px 4px;}
+table.input-table input,table.input-table select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--text);padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+table.input-table input:focus,table.input-table select:focus{border-color:var(--amber);background:#fff;}
+.row-num{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);padding:0 6px!important;text-align:center;}
+.btn-del{background:transparent;border:1.5px solid var(--border);color:var(--muted);border-radius:6px;padding:6px 9px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;}
+.btn-del:hover{border-color:var(--err);color:var(--err);}
+.btn-row{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{border:none;border-radius:8px;padding:10px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-add{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);}
+.btn-add:hover{border-color:var(--amber);color:var(--amber);}
+.btn-compute{background:var(--amber);color:#fff;box-shadow:0 4px 12px rgba(217,119,6,0.25);}
+.btn-compute:hover{background:var(--amber-d);transform:translateY(-1px);}
+.btn-clear{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-clear:hover{border-color:var(--err);color:var(--err);}
+.settings-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.field input{background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--text);padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:0.9rem;outline:none;width:160px;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--amber);background:#fff;}
+.stats-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.4rem;flex:1;min-width:130px;}
+.stat-box .lbl{font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.stat-box .val{font-size:1.4rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text);}
+.converged{color:var(--success)!important;}
+.not-converged{color:var(--err)!important;}
+.result-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.82rem;}
+.result-table th{background:rgba(217,119,6,0.08);color:var(--amber);padding:9px 14px;border:1px solid var(--border);text-align:center;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;}
+.result-table td{padding:9px 14px;border:1px solid var(--border);text-align:center;color:var(--text2);}
+.result-table tr:hover td{background:rgba(217,119,6,0.03);}
+.slack-row td{color:var(--amber)!important;font-weight:600;}
+.err-box{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:8px;padding:12px 16px;color:var(--err);font-size:0.85rem;font-family:'JetBrains Mono',monospace;margin-top:1rem;display:none;}
+.result-section{display:none;}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-brand">
+    <div class="nav-logo">⚡</div>
+    <div><span>SmartGrid Cloud</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="/ybus">Y-Bus</a>
+    <a href="/zbus">Z-Bus</a>
+    <a href="/loadflow" class="active">Load Flow</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <div class="breadcrumb"><a href="/">Home</a> › Load Flow Analysis</div>
+    <h1>🔄 Load Flow Analysis</h1>
+    <p class="page-sub">Gauss-Seidel iterative method — find bus voltages and power angles</p>
+  </div>
+
+  <div class="two-col">
+    <!-- Branch Data -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-icon">🔌</div>
+        <div><h2>Branch Data</h2><p>Transmission line parameters</p></div>
+      </div>
+      <table class="input-table">
+        <thead><tr><th>#</th><th>From</th><th>To</th><th>R (pu)</th><th>X (pu)</th><th></th></tr></thead>
+        <tbody id="branchBody"></tbody>
+      </table>
+      <div class="btn-row">
+        <button class="btn btn-add" onclick="addBranch()">+ Add Branch</button>
+      </div>
+    </div>
+
+    <!-- Bus Data -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-icon">🏙️</div>
+        <div><h2>Bus Data</h2><p>Bus types and power injections</p></div>
+      </div>
+      <table class="input-table">
+        <thead><tr><th>Bus</th><th>Type</th><th>P (pu)</th><th>Q (pu)</th><th></th></tr></thead>
+        <tbody id="busBody"></tbody>
+      </table>
+      <div class="btn-row">
+        <button class="btn btn-add" onclick="addBus()">+ Add Bus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-icon">⚙️</div>
+      <div><h2>Solver Settings</h2><p>Configure iteration parameters</p></div>
+    </div>
+    <div class="settings-row">
+      <div class="field">
+        <label>Max Iterations</label>
+        <input type="number" id="maxIter" value="100" min="1"/>
+      </div>
+      <div class="field">
+        <label>Tolerance</label>
+        <input type="number" id="tolerance" value="0.000001" step="any"/>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-compute" onclick="compute()">
+        <span id="btnText">Run Load Flow</span>
+        <span id="btnSpinner" class="spinner" style="display:none;"></span>
+      </button>
+      <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="err-box" id="errBox"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="card result-section" id="resultSection">
+    <div class="card-head">
+      <div class="card-head-icon">📊</div>
+      <div><h2>Results</h2><p>Bus voltage profile</p></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="lbl">Status</div>
+        <div class="val" id="statStatus">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="lbl">Iterations</div>
+        <div class="val" id="statIter">—</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Bus</th><th>Type</th>
+            <th>|V| (pu)</th><th>δ (deg)</th>
+            <th>P (pu)</th><th>Q (pu)</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let bCount=0, busCount=0;
+
+function addBranch(fb='',tb='',r='',x=''){
+  bCount++;
+  const tr=document.createElement('tr');
+  tr.id='br'+bCount;
+  tr.innerHTML=`
+    <td class="row-num">${bCount}</td>
+    <td><input type="number" min="1" placeholder="1" value="${fb}"/></td>
+    <td><input type="number" min="1" placeholder="2" value="${tb}"/></td>
+    <td><input type="number" step="any" placeholder="0.02" value="${r}"/></td>
+    <td><input type="number" step="any" placeholder="0.06" value="${x}"/></td>
+    <td><button class="btn-del" onclick="document.getElementById('br${bCount}').remove()">✕</button></td>
+  `;
+  document.getElementById('branchBody').appendChild(tr);
+}
+
+function addBus(bus='',type='pq',P='',Q=''){
+  busCount++;
+  const tr=document.createElement('tr');
+  tr.id='bus'+busCount;
+  tr.innerHTML=`
+    <td><input type="number" min="1" placeholder="${busCount}" value="${bus||busCount}"/></td>
+    <td>
+      <select>
+        <option value="pq" ${type==='pq'?'selected':''}>PQ (Load)</option>
+        <option value="slack" ${type==='slack'?'selected':''}>Slack</option>
+      </select>
+    </td>
+    <td><input type="number" step="any" placeholder="0" value="${P}"/></td>
+    <td><input type="number" step="any" placeholder="0" value="${Q}"/></td>
+    <td><button class="btn-del" onclick="document.getElementById('bus${busCount}').remove()">✕</button></td>
+  `;
+  document.getElementById('busBody').appendChild(tr);
+}
+
+function clearAll(){
+  document.getElementById('branchBody').innerHTML='';
+  document.getElementById('busBody').innerHTML='';
+  bCount=0; busCount=0;
+  document.getElementById('resultSection').style.display='none';
+  hideErr();
+}
+
+function showErr(m){const e=document.getElementById('errBox');e.textContent='⚠ '+m;e.style.display='block';}
+function hideErr(){document.getElementById('errBox').style.display='none';}
+
+function getBranches(){
+  const rows=document.querySelectorAll('#branchBody tr'),branches=[];
+  for(const row of rows){
+    const i=row.querySelectorAll('input');
+    const fb=parseInt(i[0].value),tb=parseInt(i[1].value),r=parseFloat(i[2].value),x=parseFloat(i[3].value);
+    if(isNaN(fb)||isNaN(tb)||isNaN(r)||isNaN(x)) return null;
+    branches.push({from_bus:fb,to_bus:tb,r,x,b:0});
+  }
+  return branches;
+}
+
+function getBuses(){
+  const rows=document.querySelectorAll('#busBody tr'),buses=[];
+  for(const row of rows){
+    const i=row.querySelectorAll('input'),s=row.querySelector('select');
+    const bus=parseInt(i[0].value),type=s.value,P=parseFloat(i[1].value)||0,Q=parseFloat(i[2].value)||0;
+    if(isNaN(bus)) return null;
+    buses.push({bus,type,P,Q});
+  }
+  return buses;
+}
+
+async function compute(){
+  hideErr();
+  const branches=getBranches(), buses=getBuses();
+  if(!branches||branches.length===0){showErr('Please add branch data.');return;}
+  if(!buses||buses.length===0){showErr('Please add bus data.');return;}
+  if(!buses.some(b=>b.type==='slack')){showErr('At least one bus must be set as Slack.');return;}
+
+  const max_iter=parseInt(document.getElementById('maxIter').value)||100;
+  const tolerance=parseFloat(document.getElementById('tolerance').value)||1e-6;
+
+  document.getElementById('btnText').textContent='Running...';
+  document.getElementById('btnSpinner').style.display='inline-block';
+  document.querySelector('.btn-compute').disabled=true;
+
+  try{
+    const res=await fetch('/api/loadflow',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({branches,buses,max_iter,tolerance})});
+    const data=await res.json();
+    if(data.error){showErr(data.error);return;}
+
+    const sv=document.getElementById('statStatus');
+    sv.textContent=data.converged?'✓ Converged':'✗ Not Converged';
+    sv.className='val '+(data.converged?'converged':'not-converged');
+    document.getElementById('statIter').textContent=data.iterations;
+
+    const tbody=document.getElementById('resultBody');
+    tbody.innerHTML='';
+    for(const b of data.buses){
+      const tr=document.createElement('tr');
+      if(b.type==='Slack') tr.className='slack-row';
+      tr.innerHTML=`<td>${b.bus}</td><td>${b.type}</td><td>${b.voltage_pu}</td><td>${b.angle_deg}°</td><td>${b.P_pu}</td><td>${b.Q_pu}</td>`;
+      tbody.appendChild(tr);
+    }
+    document.getElementById('resultSection').style.display='block';
+    document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    showErr('Connection error: '+e.message);
+  }finally{
+    document.getElementById('btnText').textContent='Run Load Flow';
+    document.getElementById('btnSpinner').style.display='none';
+    document.querySelector('.btn-compute').disabled=false;
+  }
+}
+
+// Default 3-bus example
+addBranch(1,2,0.02,0.06);
+addBranch(1,3,0.08,0.24);
+addBranch(2,3,0.06,0.18);
+addBus(1,'slack',0,0);
+addBus(2,'pq',-1.0,-0.5);
+addBus(3,'pq',-0.8,-0.3);
+</script>
+</body>
+</html>
