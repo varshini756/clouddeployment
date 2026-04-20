@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartGrid Cloud | Power System Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;--primary:#1d4ed8;--teal:#0891b2;--amber:#d97706;--text:#0f172a;--text2:#334155;--muted:#64748b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(15,23,42,0.06);}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--teal));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.brand-name{font-size:1.05rem;font-weight:700;color:var(--text);}
+.brand-sub{font-size:0.65rem;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+.nav-links{display:flex;gap:4px;}
+.nav-links a{padding:7px 14px;border-radius:7px;text-decoration:none;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.2s;}
+.nav-links a:hover{background:var(--surface2);color:var(--primary);}
+.hero{text-align:center;padding:5rem 2rem 3rem;max-width:800px;margin:0 auto;}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(29,78,216,0.08);border:1px solid rgba(29,78,216,0.18);color:var(--primary);padding:5px 16px;border-radius:999px;font-size:0.75rem;font-weight:600;letter-spacing:1px;margin-bottom:1.5rem;text-transform:uppercase;}
+.dot{width:7px;height:7px;background:#3b82f6;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.4)}}
+h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;line-height:1.15;letter-spacing:-1.5px;margin-bottom:1rem;}
+h1 span{background:linear-gradient(135deg,var(--primary),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--muted);font-size:1rem;line-height:1.7;max-width:520px;margin:0 auto 2.5rem;}
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:var(--primary);color:#fff;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:600;font-size:0.9rem;box-shadow:0 4px 14px rgba(29,78,216,0.28);}
+.btn-s{background:var(--surface);color:var(--text);padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:600;font-size:0.9rem;border:1.5px solid var(--border);}
+.divider{border:none;border-top:1px solid var(--border);margin:2rem auto;max-width:700px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.4rem;max-width:1060px;margin:0 auto;padding:0 2rem 4rem;}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:1.8rem;text-decoration:none;color:var(--text);position:relative;overflow:hidden;transition:all 0.25s;}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:opacity 0.25s;opacity:0;}
+.card:nth-child(1)::after{background:linear-gradient(90deg,var(--primary),var(--teal));}
+.card:nth-child(2)::after{background:linear-gradient(90deg,var(--teal),#22d3ee);}
+.card:nth-child(3)::after{background:linear-gradient(90deg,var(--amber),#f59e0b);}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(15,23,42,0.12);}
+.card:hover::after{opacity:1;}
+.ci{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;}
+.c1 .ci{background:rgba(29,78,216,0.08);}
+.c2 .ci{background:rgba(8,145,178,0.08);}
+.c3 .ci{background:rgba(217,119,6,0.08);}
+.card h3{font-size:1.05rem;font-weight:700;margin-bottom:0.4rem;}
+.card p{font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;}
+.tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-size:0.68rem;font-family:'JetBrains Mono',monospace;padding:2px 8px;border-radius:4px;font-weight:600;}
+.t1{background:rgba(29,78,216,0.07);color:var(--primary);}
+.t2{background:rgba(8,145,178,0.07);color:var(--teal);}
+.t3{background:rgba(217,119,6,0.07);color:var(--amber);}
+footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:0.8rem;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="brand">
+    <div class="logo">⚡</div>
+    <div><div class="brand-name">SmartGrid Cloud</div><div class="brand-sub">Power System Analysis</div></div>
+  </a>
+  <div class="nav-links">
+    <a href="/ybus">Y-Bus</a>
+    <a href="/zbus">Z-Bus</a>
+    <a href="/loadflow">Load Flow</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge"><div class="dot"></div>Smart Grid Analysis Platform</div>
+  <h1>Power System Analysis<br/>for the <span>Modern Grid</span></h1>
+  <p>Compute Y-Bus matrices, build Z-Bus using the building algorithm, and run Gauss-Seidel load flow — accurate results every time.</p>
+  <div class="btns">
+    <a href="/ybus" class="btn-p">Start Calculating →</a>
+    <a href="/loadflow" class="btn-s">Load Flow Analysis</a>
+  </div>
+</div>
+<hr class="divider"/>
+<div class="cards">
+  <a href="/ybus" class="card c1">
+    <div class="ci">⚡</div>
+    <h3>Y-Bus Calculator</h3>
+    <p>Build the nodal admittance matrix from branch impedance data. Enter From Bus, To Bus, R and X values.</p>
+    <div class="tags"><span class="tag t1">Admittance Matrix</span><span class="tag t1">N-Bus</span><span class="tag t1">Line Charging</span></div>
+  </a>
+  <a href="/zbus" class="card c2">
+    <div class="ci">🔷</div>
+    <h3>Z-Bus Calculator</h3>
+    <p>Build the bus impedance matrix using the Z-Bus building algorithm with all 4 modification types and Kron reduction.</p>
+    <div class="tags"><span class="tag t2">Building Algorithm</span><span class="tag t2">4 Types</span><span class="tag t2">Kron Reduction</span></div>
+  </a>
+  <a href="/loadflow" class="card c3">
+    <div class="ci">🔄</div>
+    <h3>Load Flow Analysis</h3>
+    <p>Gauss-Seidel iterative load flow — Slack, PQ and PV buses. Results match Hadi Saadat Power System Analysis.</p>
+    <div class="tags"><span class="tag t3">Gauss-Seidel</span><span class="tag t3">PQ / PV / Slack</span><span class="tag t3">Convergence</span></div>
+  </a>
+</div>
+<footer>SmartGrid Cloud Deployment · Power System Analysis Platform</footer>
+</body>
+</html>

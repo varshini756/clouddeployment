@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Load Flow | SmartGrid Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;--amber:#d97706;--amber-d:#b45309;--primary:#1d4ed8;--text:#0f172a;--text2:#334155;--muted:#64748b;--success:#16a34a;--err:#dc2626;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(15,23,42,0.06);}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.brand-name{font-size:1.05rem;font-weight:700;color:var(--text);}
+.nav-links{display:flex;gap:4px;}
+.nav-links a{padding:7px 14px;border-radius:7px;text-decoration:none;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.2s;}
+.nav-links a:hover,.nav-links a.active{background:rgba(217,119,6,0.08);color:var(--amber);}
+.wrap{max-width:1060px;margin:0 auto;padding:2rem;}
+.crumb{font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;}
+.crumb a{color:var(--amber);text-decoration:none;}
+h1{font-size:1.7rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:0.25rem;}
+.sub{color:var(--muted);font-size:0.875rem;margin-bottom:1.8rem;}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:1.8rem;margin-bottom:1.5rem;}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:1.4rem;}
+.ci{width:36px;height:36px;background:rgba(217,119,6,0.09);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.ch h2{font-size:1rem;font-weight:700;margin-bottom:1px;}
+.ch small{font-size:0.73rem;color:var(--muted);}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:700px){.two{grid-template-columns:1fr;}}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl thead th{font-size:0.72rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);padding:9px 6px;border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;}
+.tbl tbody td{padding:5px 4px;vertical-align:middle;}
+.tbl input,.tbl select{
+  display:block;width:100%;
+  background:#fff;border:2px solid #cbd5e1;border-radius:8px;
+  color:var(--text);padding:10px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:0.95rem;font-weight:600;
+  outline:none;transition:border-color 0.2s,background 0.2s;
+  min-width:72px;
+}
+.tbl input:focus,.tbl select:focus{border-color:var(--amber);background:#fffbf5;}
+.tbl input.locked{background:#f1f5f9!important;color:#94a3b8!important;border-color:#e2e8f0!important;cursor:not-allowed;}
+.tbl input::placeholder{color:#cbd5e1;font-weight:400;}
+.rn{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);text-align:center;padding:0 4px!important;}
+.del{background:transparent;border:2px solid #e2e8f0;color:#94a3b8;border-radius:7px;padding:9px 11px;cursor:pointer;font-size:0.85rem;line-height:1;transition:all 0.2s;}
+.del:hover{border-color:var(--err);color:var(--err);}
+.brow{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{border:none;border-radius:8px;padding:11px 22px;font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-add{background:var(--surface2);border:2px solid var(--border);color:var(--text2);}
+.btn-add:hover{border-color:var(--amber);color:var(--amber);}
+.btn-run{background:var(--amber);color:#fff;box-shadow:0 4px 14px rgba(217,119,6,0.28);}
+.btn-run:hover{background:var(--amber-d);transform:translateY(-1px);}
+.btn-clr{background:transparent;border:2px solid var(--border);color:var(--muted);}
+.btn-clr:hover{border-color:var(--err);color:var(--err);}
+.srow{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.fld label{font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;}
+.fld input{width:155px;background:#fff;border:2px solid #cbd5e1;border-radius:8px;color:var(--text);padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:0.95rem;font-weight:600;outline:none;}
+.fld input:focus{border-color:var(--amber);}
+.err-box{background:rgba(220,38,38,0.06);border:2px solid rgba(220,38,38,0.22);border-radius:8px;padding:12px 16px;color:var(--err);font-size:0.9rem;font-weight:600;margin-top:1.1rem;display:none;}
+.res-card{display:none;}
+.stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem;}
+.sbox{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:1rem 1.4rem;flex:1;min-width:120px;}
+.sbox .sl{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.sbox .sv{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.ok{color:var(--success)!important;}
+.no{color:var(--err)!important;}
+.rt{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.85rem;}
+.rt th{background:rgba(217,119,6,0.07);color:var(--amber);padding:10px 13px;border:1px solid var(--border);text-align:center;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.rt td{padding:10px 13px;border:1px solid var(--border);text-align:center;color:var(--text2);}
+.rt tr:hover td{background:rgba(217,119,6,0.02);}
+.rt tr.slk td{color:var(--amber);font-weight:700;}
+.rt tr.pvr td{color:var(--primary);font-weight:600;}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;animation:sp 0.6s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand"><div class="logo">⚡</div><div class="brand-name">SmartGrid Cloud</div></a>
+  <div class="nav-links">
+    <a href="/ybus">Y-Bus</a>
+    <a href="/zbus">Z-Bus</a>
+    <a href="/loadflow" class="active">Load Flow</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="crumb"><a href="/">Home</a> › Load Flow</div>
+  <h1>🔄 Load Flow — Gauss-Seidel</h1>
+  <p class="sub">Enter values in per unit (pu) · PQ loads = negative P and Q · PV generators = positive P</p>
+
+  <div class="two">
+
+    <!-- BRANCH DATA -->
+    <div class="card">
+      <div class="ch">
+        <div class="ci">🔌</div>
+        <div><h2>Branch Data</h2><small>Line impedances in per unit</small></div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="branchTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>From Bus</th>
+              <th>To Bus</th>
+              <th>R (pu)</th>
+              <th>X (pu)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="branchBody"></tbody>
+        </table>
+      </div>
+      <div class="brow">
+        <button class="btn btn-add" onclick="addBranch()">+ Add Branch</button>
+      </div>
+    </div>
+
+    <!-- BUS DATA -->
+    <div class="card">
+      <div class="ch">
+        <div class="ci">🏙️</div>
+        <div><h2>Bus Data</h2><small>PQ: load=−ve · PV: gen=+ve · Slack: reference</small></div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="busTable">
+          <thead>
+            <tr>
+              <th>Bus</th>
+              <th>Type</th>
+              <th>P (pu)</th>
+              <th>Q (pu)</th>
+              <th>|V| spec</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="busBody"></tbody>
+        </table>
+      </div>
+      <div class="brow">
+        <button class="btn btn-add" onclick="addBus()">+ Add Bus</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="card">
+    <div class="ch">
+      <div class="ci">⚙️</div>
+      <div><h2>Solver Settings</h2><small>Gauss-Seidel with acceleration factor 1.6</small></div>
+    </div>
+    <div class="srow">
+      <div class="fld">
+        <label>Max Iterations</label>
+        <input type="number" id="maxIter" value="100" min="1"/>
+      </div>
+      <div class="fld">
+        <label>Tolerance</label>
+        <input type="number" id="tol" value="0.0001" step="any"/>
+      </div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-run" id="cbtn" onclick="runFlow()">
+        <span id="ct">Run Load Flow</span>
+        <span id="cs" class="spin" style="display:none;"></span>
+      </button>
+      <button class="btn btn-clr" onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="err-box" id="errBox"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="card res-card" id="resCard">
+    <div class="ch">
+      <div class="ci">📊</div>
+      <div><h2>Results</h2><small>Bus voltage profile after convergence</small></div>
+    </div>
+    <div class="stats">
+      <div class="sbox"><div class="sl">Status</div><div class="sv" id="sv">—</div></div>
+      <div class="sbox"><div class="sl">Iterations</div><div class="sv" id="si">—</div></div>
+    </div>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+      <table class="rt">
+        <thead>
+          <tr>
+            <th>Bus</th><th>Type</th>
+            <th>|V| (pu)</th><th>Angle (°)</th>
+            <th>V rectangular</th>
+            <th>P (pu)</th><th>Q (pu)</th>
+          </tr>
+        </thead>
+        <tbody id="resBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let bc = 0;
+let busc = 0;
+
+/* ── ADD BRANCH ────────────────────────────────────────────── */
+function addBranch() {
+  bc++;
+  const n = bc;
+  const tr = document.createElement('tr');
+  tr.setAttribute('id', 'BR' + n);
+  tr.innerHTML =
+    '<td class="rn">' + n + '</td>' +
+    '<td><input type="number" min="1" placeholder="1"/></td>' +
+    '<td><input type="number" min="1" placeholder="2"/></td>' +
+    '<td><input type="number" step="any" placeholder="0.02"/></td>' +
+    '<td><input type="number" step="any" placeholder="0.06"/></td>' +
+    '<td><button class="del" onclick="document.getElementById(\'BR' + n + '\').remove()">✕</button></td>';
+  document.getElementById('branchBody').appendChild(tr);
+}
+
+/* ── ADD BUS ───────────────────────────────────────────────── */
+function addBus() {
+  busc++;
+  const n = busc;
+  const tr = document.createElement('tr');
+  tr.setAttribute('id', 'BUS' + n);
+  tr.innerHTML =
+    '<td><input type="number" min="1" placeholder="' + n + '"/></td>' +
+    '<td><select onchange="toggleBus(this,\'BUS' + n + '\')">' +
+      '<option value="pq">PQ (Load)</option>' +
+      '<option value="pv">PV (Generator)</option>' +
+      '<option value="slack">Slack</option>' +
+    '</select></td>' +
+    '<td><input type="number" step="any" placeholder="0" class="p-inp"/></td>' +
+    '<td><input type="number" step="any" placeholder="0" class="q-inp"/></td>' +
+    '<td><input type="number" step="any" placeholder="1.0" class="v-inp locked" readonly/></td>' +
+    '<td><button class="del" onclick="document.getElementById(\'BUS' + n + '\').remove()">✕</button></td>';
+  document.getElementById('busBody').appendChild(tr);
+}
+
+/* ── TOGGLE BUS TYPE ───────────────────────────────────────── */
+function toggleBus(sel, rowId) {
+  const row  = document.getElementById(rowId);
+  const pinp = row.querySelector('.p-inp');
+  const qinp = row.querySelector('.q-inp');
+  const vinp = row.querySelector('.v-inp');
+  const t    = sel.value;
+
+  function lock(el)   { el.readOnly = true;  el.classList.add('locked');    el.value = ''; }
+  function unlock(el) { el.readOnly = false; el.classList.remove('locked'); }
+
+  if (t === 'slack') { lock(pinp); lock(qinp); unlock(vinp); }
+  else if (t === 'pv') { unlock(pinp); lock(qinp); unlock(vinp); }
+  else { unlock(pinp); unlock(qinp); lock(vinp); }
+}
+
+/* ── CLEAR ALL ─────────────────────────────────────────────── */
+function clearAll() {
+  document.getElementById('branchBody').innerHTML = '';
+  document.getElementById('busBody').innerHTML    = '';
+  bc = 0; busc = 0;
+  document.getElementById('resCard').style.display  = 'none';
+  document.getElementById('errBox').style.display   = 'none';
+}
+
+function showErr(m) { const e = document.getElementById('errBox'); e.textContent = '⚠  ' + m; e.style.display = 'block'; }
+function hideErr()  { document.getElementById('errBox').style.display = 'none'; }
+
+/* ── COLLECT BRANCH DATA ───────────────────────────────────── */
+function getBranches() {
+  const rows     = document.querySelectorAll('#branchBody tr');
+  const branches = [];
+  for (let i = 0; i < rows.length; i++) {
+    const inp = rows[i].querySelectorAll('input');
+    const fb  = parseFloat(inp[0].value);
+    const tb  = parseFloat(inp[1].value);
+    const r   = parseFloat(inp[2].value);
+    const x   = parseFloat(inp[3].value);
+    if (isNaN(fb) || isNaN(tb) || isNaN(r) || isNaN(x)) return null;
+    branches.push({ from_bus: Math.round(fb), to_bus: Math.round(tb), r: r, x: x, b: 0.0 });
+  }
+  return branches;
+}
+
+/* ── COLLECT BUS DATA ──────────────────────────────────────── */
+function getBuses() {
+  const rows  = document.querySelectorAll('#busBody tr');
+  const buses = [];
+  for (let i = 0; i < rows.length; i++) {
+    const inp  = rows[i].querySelectorAll('input');
+    const sel  = rows[i].querySelector('select');
+    const bus  = parseFloat(inp[0].value);
+    const type = sel.value;
+    const P    = inp[1].readOnly ? 0.0 : (parseFloat(inp[1].value) || 0.0);
+    const Q    = inp[2].readOnly ? 0.0 : (parseFloat(inp[2].value) || 0.0);
+    const Vmag = inp[3].readOnly ? 1.0 : (parseFloat(inp[3].value) || 1.0);
+    if (isNaN(bus)) return null;
+    buses.push({ bus: Math.round(bus), type: type, P: P, Q: Q, Vmag: Vmag });
+  }
+  return buses;
+}
+
+/* ── RUN LOAD FLOW ─────────────────────────────────────────── */
+async function runFlow() {
+  hideErr();
+
+  const branches = getBranches();
+  const buses    = getBuses();
+
+  if (branches === null)    { showErr('Invalid branch values — please fill all From Bus, To Bus, R and X fields correctly.'); return; }
+  if (branches.length === 0){ showErr('No branch data found. Click + Add Branch and enter values.'); return; }
+  if (buses === null)        { showErr('Invalid bus values — please check bus number fields.'); return; }
+  if (buses.length === 0)   { showErr('No bus data found. Click + Add Bus and enter values.'); return; }
+  if (!buses.some(b => b.type === 'slack')) { showErr('No Slack bus defined. Change one bus type to Slack.'); return; }
+
+  const max_iter  = parseInt(document.getElementById('maxIter').value) || 100;
+  const tolerance = parseFloat(document.getElementById('tol').value)   || 1e-4;
+
+  document.getElementById('ct').textContent      = 'Running...';
+  document.getElementById('cs').style.display    = 'inline-block';
+  document.getElementById('cbtn').disabled       = true;
+
+  try {
+    const res  = await fetch('/api/loadflow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ branches: branches, buses: buses, max_iter: max_iter, tolerance: tolerance })
+    });
+    const data = await res.json();
+
+    if (data.error) { showErr(data.error); return; }
+
+    const sv = document.getElementById('sv');
+    sv.textContent = data.converged ? '✓ Converged' : '✗ Not Converged';
+    sv.className   = 'sv ' + (data.converged ? 'ok' : 'no');
+    document.getElementById('si').textContent = data.iterations;
+
+    const tbody = document.getElementById('resBody');
+    tbody.innerHTML = '';
+    for (let i = 0; i < data.buses.length; i++) {
+      const b  = data.buses[i];
+      const tr = document.createElement('tr');
+      tr.className = b.type === 'SLACK' ? 'slk' : b.type === 'PV' ? 'pvr' : '';
+      tr.innerHTML =
+        '<td>' + b.bus      + '</td>' +
+        '<td>' + b.type     + '</td>' +
+        '<td>' + b.voltage_pu + '</td>' +
+        '<td>' + b.angle_deg  + '°</td>' +
+        '<td>' + b.V_rect     + '</td>' +
+        '<td>' + b.P_pu       + '</td>' +
+        '<td>' + b.Q_pu       + '</td>';
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById('resCard').style.display = 'block';
+    document.getElementById('resCard').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    showErr('Connection error: ' + err.message);
+  } finally {
+    document.getElementById('ct').textContent   = 'Run Load Flow';
+    document.getElementById('cs').style.display = 'none';
+    document.getElementById('cbtn').disabled    = false;
+  }
+}
+</script>
+</body>
+</html>
